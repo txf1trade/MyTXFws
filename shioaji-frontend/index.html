@@ -1,0 +1,1725 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shioaji 即時報價看板 - Trading Terminal</title>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts for Monospace and UI typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0d0e12;
+            --panel-bg: #131722;
+            --panel-border: #2a2e39;
+            --card-inner-bg: #1e222d;
+            --accent-gold: #f0b90b;
+            --green-up: #00c076;
+            --red-down: #f6465d;
+            --text-primary: #e0e3eb;
+            --text-secondary: #848e9c;
+            --font-mono: 'JetBrains Mono', monospace;
+            --font-main: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            font-size: clamp(10px, 1.1vw, 12px);
+            line-height: 1.3;
+            -webkit-font-smoothing: antialiased;
+            padding: clamp(4px, 1vw, 8px);
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 100%;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: clamp(4px, 1vw, 8px);
+        }
+
+        /* 1. Top Bar */
+        .top-bar {
+            background-color: #08090c;
+            border: 1px solid var(--panel-border);
+            border-radius: 4px;
+            padding: 6px clamp(8px, 1.2vw, 14px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .top-bar-left {
+            display: flex;
+            align-items: center;
+            gap: clamp(6px, 1vw, 12px);
+            flex-wrap: wrap;
+        }
+
+        .brand-logo {
+            font-size: clamp(0.9rem, 1.2vw, 1.15rem);
+            font-weight: 800;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            letter-spacing: -0.5px;
+        }
+
+        .brand-subtitle {
+            font-size: clamp(0.68rem, 0.8vw, 0.8rem);
+            color: var(--text-secondary);
+            font-weight: 400;
+            margin-left: 2px;
+        }
+
+        .badge-real {
+            background: rgba(0, 192, 118, 0.15);
+            color: var(--green-up);
+            border: 1px solid rgba(0, 192, 118, 0.3);
+            border-radius: 8px;
+            padding: 1px 6px;
+            font-size: clamp(0.65rem, 0.75vw, 0.72rem);
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .status-dot-text {
+            color: var(--text-secondary);
+            font-size: clamp(0.68rem, 0.8vw, 0.78rem);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .status-dot-yellow {
+            width: 6px;
+            height: 6px;
+            background-color: var(--accent-gold);
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 5px rgba(240, 185, 11, 0.6);
+        }
+
+        .top-bar-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .mode-toggle-group {
+            display: flex;
+            background-color: var(--card-inner-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            padding: 2px;
+            gap: 2px;
+        }
+        .mode-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 3px 9px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .mode-btn.active {
+            background-color: var(--accent-gold);
+            color: #000000;
+            font-weight: 800;
+        }
+
+        .btn-hamburger {
+            background-color: transparent;
+            border: 1px solid var(--panel-border);
+            color: var(--accent-gold);
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .btn-hamburger:hover {
+            background-color: var(--accent-gold);
+            color: #000;
+        }
+
+        /* 2. Multi-Card Market Strip */
+        .market-strip-grid {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            gap: clamp(4px, 0.8vw, 8px);
+            width: 100%;
+        }
+
+        .market-card {
+            background-color: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 4px;
+            padding: clamp(4px, 0.8vw, 8px) clamp(6px, 1vw, 10px);
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            flex: 1 1 0;
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        .market-card-title {
+            color: var(--accent-gold);
+            font-weight: 700;
+            font-size: clamp(0.7rem, 0.9vw, 0.82rem);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .market-card-body {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 4px;
+            min-width: 0;
+        }
+
+        .market-card-left {
+            display: flex;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .mini-candle {
+            width: clamp(10px, 1.2vw, 14px);
+            height: clamp(22px, 2.5vw, 28px);
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .candle-wick {
+            position: absolute;
+            width: 1.5px;
+            top: 1px;
+            bottom: 1px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--text-secondary);
+        }
+        .candle-body {
+            position: absolute;
+            width: 80%;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 1px;
+            background-color: var(--text-secondary);
+        }
+
+        .market-card-right {
+            text-align: right;
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        .market-price {
+            font-size: clamp(0.85rem, 1.4vw, 1.15rem);
+            font-weight: 800;
+            font-family: var(--font-mono);
+            line-height: 1.1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .market-change {
+            font-size: clamp(0.62rem, 0.85vw, 0.75rem);
+            font-family: var(--font-mono);
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .up-text { color: var(--red-down); }   
+        .down-text { color: var(--green-up); } 
+        .flat-text { color: var(--text-primary); }
+
+        /* 3. Contract Switch Tabs */
+        .contract-tabs-bar {
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+            min-height: 38px;
+        }
+
+        .contract-tab {
+            background-color: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            color: var(--text-secondary);
+            padding: 5px 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+            font-family: var(--font-mono);
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            flex-shrink: 0;
+        }
+
+        .contract-tab .tab-label {
+            font-size: clamp(0.75rem, 0.9vw, 0.85rem);
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .contract-tab .tab-date {
+            font-size: clamp(0.6rem, 0.7vw, 0.68rem);
+            color: var(--text-secondary);
+        }
+
+        .contract-tab:hover {
+            border-color: var(--accent-gold);
+        }
+
+        .contract-tab.active {
+            background-color: var(--accent-gold);
+            border-color: var(--accent-gold);
+        }
+
+        .contract-tab.active .tab-label {
+            color: #000000;
+        }
+
+        .contract-tab.active .tab-date {
+            color: rgba(0, 0, 0, 0.75);
+        }
+
+        /* 4. Detailed Main Cards */
+        .main-card {
+            background-color: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 4px;
+            padding: clamp(8px, 1.2vw, 14px) clamp(10px, 1.5vw, 16px);
+            display: flex;
+            flex-direction: column;
+            gap: clamp(6px, 1vw, 10px);
+            width: 100%;
+        }
+
+        .clickable-card {
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .clickable-card:hover {
+            background-color: #181c27;
+        }
+
+        .quote-header-box {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 2px;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .symbol-title-area .symbol-code {
+            font-size: clamp(0.85rem, 1.2vw, 1rem);
+            font-weight: 800;
+            color: var(--accent-gold);
+            font-family: var(--font-mono);
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .price-display-area {
+            text-align: right;
+        }
+
+        .big-price {
+            font-size: clamp(1.2rem, 2.0vw, 1.6rem);
+            font-weight: 800;
+            font-family: var(--font-mono);
+            line-height: 1.1;
+            letter-spacing: -0.5px;
+        }
+
+        .change-line {
+            font-size: clamp(0.68rem, 0.9vw, 0.78rem);
+            font-family: var(--font-mono);
+            font-weight: 600;
+            margin-top: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 4px;
+        }
+
+        .vol-right-box {
+            text-align: right;
+            padding-left: 10px;
+            border-left: 1px solid #1e222d;
+        }
+        .vol-label {
+            font-size: clamp(0.58rem, 0.68vw, 0.65rem);
+            color: var(--text-secondary);
+            margin-bottom: 2px;
+        }
+        .vol-value {
+            font-size: clamp(0.95rem, 1.3vw, 1.1rem);
+            font-weight: 800;
+            font-family: var(--font-mono);
+            color: var(--text-primary);
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: clamp(4px, 0.8vw, 8px);
+            margin-top: 4px;
+            padding-top: 8px;
+            border-top: 1px dashed #2a2e39;
+        }
+
+        .metric-box {
+            background-color: var(--card-inner-bg);
+            border: 1px solid #232733;
+            border-radius: 3px;
+            padding: clamp(4px, 0.8vw, 8px);
+            text-align: center;
+        }
+
+        .metric-label {
+            font-size: clamp(0.62rem, 0.72vw, 0.68rem);
+            color: var(--text-secondary);
+            margin-bottom: 2px;
+        }
+
+        .metric-value {
+            font-size: clamp(0.82rem, 1.2vw, 1.05rem);
+            font-weight: 700;
+            font-family: var(--font-mono);
+            color: var(--text-primary);
+        }
+
+        /* T-Quote Table Header 買權與賣權樣式 */
+        .t-quote-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #181c27;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-weight: 700;
+            font-size: 0.88rem;
+            margin-bottom: 6px;
+            gap: 8px;
+        }
+
+        .header-badge-call {
+            background-color: var(--red-down);
+            color: #ffffff;
+            padding: 6px 12px;
+            border-radius: 4px;
+            text-align: center;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            width: 37%;
+            font-size: 0.82rem;
+            box-shadow: 0 2px 4px rgba(246, 70, 93, 0.3);
+            flex-shrink: 0;
+        }
+
+        .header-badge-put {
+            background-color: var(--green-up);
+            color: #ffffff;
+            padding: 6px 12px;
+            border-radius: 4px;
+            text-align: center;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            width: 37%;
+            font-size: 0.82rem;
+            box-shadow: 0 2px 4px rgba(0, 192, 118, 0.3);
+            flex-shrink: 0;
+        }
+
+        .t-quote-title-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            text-align: center;
+            position: relative;
+            flex: 0 0 auto;
+            padding: 0 6px;
+        }
+        .t-table-main-title {
+            color: var(--accent-gold);
+            font-family: var(--font-mono);
+            font-size: 0.88rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+        }
+        .t-table-sub-title {
+            color: var(--text-secondary);
+            font-size: 0.68rem;
+            font-family: var(--font-mono);
+        }
+        .contract-select-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        /* T字表捲軸容器 */
+        .t-table-container {
+            max-height: 450px;
+            overflow-y: auto;
+        }
+
+        /* 螢幕寬高縮小時：僅針對契約水平膠囊與 T 字表垂直滑桿調整為半透明纖細不顯眼 */
+        @media (max-width: 1200px), (max-height: 800px) {
+            .contract-tabs-bar::-webkit-scrollbar,
+            .t-table-container::-webkit-scrollbar {
+                height: 4px;
+                width: 4px;
+            }
+            .contract-tabs-bar::-webkit-scrollbar-thumb,
+            .t-table-container::-webkit-scrollbar-thumb {
+                background: rgba(132, 142, 156, 0.2);
+                border-radius: 4px;
+            }
+            .contract-tabs-bar::-webkit-scrollbar-track,
+            .t-table-container::-webkit-scrollbar-track {
+                background: transparent;
+            }
+            .contract-tabs-bar::-webkit-scrollbar-thumb:hover,
+            .t-table-container::-webkit-scrollbar-thumb:hover {
+                background: rgba(132, 142, 156, 0.5);
+            }
+        }
+
+        .t-quote-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+        }
+        
+        .t-quote-table th {
+            position: sticky;
+            top: 0;
+            z-index: 5;
+            background-color: #181c27;
+            color: #ffffff;
+            padding: 6px 2px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            border-bottom: 1px solid var(--panel-border);
+            vertical-align: middle;
+        }
+        
+        .t-quote-table th.strike-header {
+            cursor: pointer;
+            user-select: none;
+            transition: color 0.2s;
+            width: 14%;
+            text-align: center;
+            color: var(--accent-gold);
+        }
+        .t-quote-table th.strike-header:hover {
+            color: #ffffff;
+        }
+        .t-quote-table th.ref-header {
+            width: 12%;
+            text-align: center;
+            color: var(--accent-gold);
+        }
+        .t-quote-table td {
+            padding: 4px 2px;
+            text-align: center;
+            border-bottom: 1px solid #1a1e29;
+            vertical-align: middle;
+        }
+        
+        .strike-col {
+            color: var(--text-primary);
+            font-weight: 700;
+            background-color: #181c27;
+            text-align: center;
+            font-size: 0.76rem;
+            width: 14%;
+        }
+
+        .ref-col {
+            color: var(--accent-gold);
+            font-weight: 800;
+            background-color: #181c27;
+            text-align: center;
+            font-size: 0.76rem;
+            width: 12%;
+        }
+
+        .atm-strike {
+            background-color: var(--accent-gold) !important;
+            color: #000000 !important;
+            font-weight: 900;
+            box-shadow: inset 0 0 8px rgba(0,0,0,0.3);
+        }
+        .atm-ref {
+            background-color: var(--accent-gold) !important;
+            color: #000000 !important;
+            font-weight: 900;
+            box-shadow: inset 0 0 8px rgba(0,0,0,0.3);
+        }
+
+        .side-col {
+            width: 37%;
+        }
+
+        .side-inner {
+            display: grid;
+            grid-template-columns: 36% 20% 20% 24%;
+            align-items: center;
+            width: 100%;
+            padding: 0 2px;
+        }
+        
+        .col-code {
+            color: var(--text-secondary);
+            font-size: 0.65rem;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .col-vol {
+            color: #ffffff;
+            font-size: 0.7rem;
+            text-align: center;
+        }
+        .col-strength {
+            color: #ffffff;
+            font-size: 0.7rem;
+            text-align: center;
+        }
+        .col-price {
+            font-weight: 700;
+            color: #ffffff;
+            font-size: 0.72rem;
+            text-align: center;
+        }
+
+        .ws-status-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: clamp(0.65rem, 0.75vw, 0.72rem);
+            color: var(--text-muted);
+            padding-top: 4px;
+            border-top: 1px dashed #232733;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .indicator-dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background-color: #666;
+        }
+
+        .indicator-dot.online {
+            background-color: var(--green-up);
+            box-shadow: 0 0 5px var(--green-up);
+        }
+
+        .indicator-dot.offline {
+            background-color: var(--accent-gold);
+        }
+
+        /* Modal Popup */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-card {
+            background-color: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 6px;
+            padding: 16px;
+            width: 380px;
+            max-width: 90%;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .modal-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--accent-gold);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-close {
+            background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 1rem;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .form-group label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+        .form-group input, .form-group select {
+            background-color: var(--card-inner-bg);
+            border: 1px solid var(--panel-border);
+            color: var(--text-primary);
+            padding: 6px 8px;
+            border-radius: 4px;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+        }
+
+        .usage-bar-container {
+            position: relative;
+            background-color: var(--card-inner-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 4px;
+            overflow: hidden;
+            padding: 8px;
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            color: var(--text-primary);
+        }
+        .usage-progress-fill {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background-color: rgba(240, 185, 11, 0.15);
+            border-right: 2px solid var(--accent-gold);
+            transition: width 0.4s ease;
+            z-index: 1;
+        }
+        .usage-content {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 4px;
+        }
+        .btn-modal {
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-cancel {
+            background: transparent; border: 1px solid var(--panel-border); color: var(--text-secondary);
+        }
+        .btn-save {
+            background: var(--accent-gold); border: none; color: #000;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- 1. Top Bar -->
+        <header class="top-bar">
+            <div class="top-bar-left">
+                <div class="brand-logo">
+                    選擇權 <span class="brand-subtitle">| 永豐金 Shioaji</span>
+                </div>
+                <div class="badge-real">
+                    <i class="fa-solid fa-circle-check"></i> 實盤正式
+                </div>
+                <div class="status-dot-text">
+                    <span class="status-dot-yellow"></span>
+                    <span>實盤 · 週末休市中</span>
+                    <span id="top-clock" style="font-family: var(--font-mono); margin-left: 4px;">13:43:35</span>
+                </div>
+            </div>
+            <div class="top-bar-right">
+                <!-- 即時 / 快照切換按鈕組 -->
+                <div class="mode-toggle-group">
+                    <button class="mode-btn active" id="btn-mode-stream" title="即時連續推送更新">
+                        <i class="fa-solid fa-bolt"></i> 即時
+                    </button>
+                    <button class="mode-btn" id="btn-mode-snapshot" title="快照模式（休市或手動更新）">
+                        <i class="fa-solid fa-camera"></i> 快照
+                    </button>
+                </div>
+                <button class="btn-hamburger" id="btn-open-modal" title="設定與流量">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- 2. Multi-Card Market Strip -->
+        <section class="market-strip-grid">
+            <div class="market-card">
+                <div class="market-card-title">加權指數</div>
+                <div class="market-card-body">
+                    <div class="market-card-left">
+                        <div class="mini-candle">
+                            <div class="candle-wick" id="wick-IX0001"></div>
+                            <div class="candle-body" id="body-IX0001"></div>
+                        </div>
+                    </div>
+                    <div class="market-card-right">
+                        <div class="market-price flat-text" id="price-IX0001">--</div>
+                        <div class="market-change flat-text" id="chg-IX0001">-- (--%)</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="market-card">
+                <div class="market-card-title">櫃買指數</div>
+                <div class="market-card-body">
+                    <div class="market-card-left">
+                        <div class="mini-candle">
+                            <div class="candle-wick" id="wick-IX0043"></div>
+                            <div class="candle-body" id="body-IX0043"></div>
+                        </div>
+                    </div>
+                    <div class="market-card-right">
+                        <div class="market-price flat-text" id="price-IX0043">--</div>
+                        <div class="market-change flat-text" id="chg-IX0043">-- (--%)</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="market-card">
+                <div class="market-card-title">台指期</div>
+                <div class="market-card-body">
+                    <div class="market-card-left">
+                        <div class="mini-candle">
+                            <div class="candle-wick" id="wick-TXFR1"></div>
+                            <div class="candle-body" id="body-TXFR1"></div>
+                        </div>
+                    </div>
+                    <div class="market-card-right">
+                        <div class="market-price flat-text" id="price-TXFR1">--</div>
+                        <div class="market-change flat-text" id="chg-TXFR1">-- (--%)</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Contract Switch Tabs -->
+        <nav class="contract-tabs-bar" id="contract-tabs">
+            <!-- 由 JavaScript 動態填入 -->
+        </nav>
+
+        <!-- 4. Main Cards -->
+        <main style="display: flex; flex-direction: column; gap: 8px;">
+            
+            <!-- 台指近月 -->
+            <div class="main-card clickable-card" id="tx-card" style="border-left: 3px solid var(--accent-gold);">
+                <div class="quote-header-box">
+                    <div class="symbol-title-area">
+                        <div class="symbol-code">
+                            <span>台指近月</span>
+                            <i class="fa-solid fa-chevron-down" id="tx-toggle-icon" style="font-size: 0.7rem; color: var(--text-secondary); transition: transform 0.2s;"></i>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div class="price-display-area">
+                            <div class="big-price flat-text" id="tx-close">--</div>
+                            <div class="change-line flat-text" id="tx-chg-container">
+                                <span>漲跌:</span>
+                                <span id="tx-price_chg">--</span>
+                                <span>(<span id="tx-pct_chg">--</span>%)</span>
+                            </div>
+                        </div>
+                        
+                        <div class="vol-right-box">
+                            <div class="vol-label">總量</div>
+                            <div class="vol-value" id="tx-total_volume">--</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="metrics-grid" id="tx-metrics-grid" style="display: none; grid-template-columns: repeat(3, 1fr);">
+                    <div class="metric-box">
+                        <div class="metric-label">開盤價</div>
+                        <div class="metric-value" id="tx-open">--</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-label">最高價</div>
+                        <div class="metric-value" id="tx-high">--</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-label">最低價</div>
+                        <div class="metric-value" id="tx-low">--</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-label">均價</div>
+                        <div class="metric-value" id="tx-avg-price">--</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-label">內盤量</div>
+                        <div class="metric-value" id="tx-bid-vol" style="color: var(--green-up);">--</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-label">賣盤量</div>
+                        <div class="metric-value" id="tx-ask-vol" style="color: var(--red-down);">--</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 周小台選擇權資訊卡片 -->
+            <div class="main-card clickable-card" id="option-info-card" style="border-left: 3px solid var(--green-up);">
+                <div class="quote-header-box">
+                    <div class="symbol-title-area">
+                        <div class="symbol-code" id="option-card-title-code" style="color: var(--green-up);">
+                            <span>周小台選擇權資訊</span>
+                            <i class="fa-solid fa-chevron-down" id="option-toggle-icon" style="font-size: 0.7rem; color: var(--text-secondary); transition: transform 0.2s;"></i>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div class="price-display-area">
+                            <div class="big-price" id="mini-tx-points" style="color: var(--green-up);">--</div>
+                            <div class="change-line" style="color: var(--text-secondary);">周小台點數</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="metrics-grid" id="option-metrics-grid" style="display: none; grid-template-columns: repeat(3, 1fr);">
+                    <div class="metric-box">
+                        <div class="metric-label">價平履約價</div>
+                        <div class="metric-value" id="atm-strike-display" style="color: var(--accent-gold);">--</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-label">I 值</div>
+                        <div class="metric-value" id="atm-ivalue-display">--</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-label" id="basis-label">價差</div>
+                        <div class="metric-value" id="basis-display">--</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 選擇權 T 字表 -->
+            <div class="main-card">
+                <div class="t-quote-header">
+                    <div class="header-badge-call">買權 CALL</div>
+                    
+                    <div class="t-quote-title-container">
+                        <div class="t-table-main-title">
+                            <i class="fa-solid fa-caret-left" style="font-size: 0.8rem;"></i>
+                            <span id="current-header-label">載入中...</span>
+                            <i class="fa-solid fa-caret-right" style="font-size: 0.8rem;"></i>
+                        </div>
+                        <div class="t-table-sub-title" id="t-table-subtitle">(剩 --天)</div>
+                        <select id="contract-dropdown" class="contract-select-overlay" title="選擇契約"></select>
+                    </div>
+
+                    <div class="header-badge-put">賣權 PUT</div>
+                </div>
+
+                <div class="t-table-container">
+                    <table class="t-quote-table">
+                        <thead>
+                            <tr>
+                                <th class="side-col">
+                                    <div class="side-inner">
+                                        <span class="col-code">多方目標</span>
+                                        <span class="col-vol">總量</span>
+                                        <span class="col-strength">力道</span>
+                                        <span class="col-price">價格</span>
+                                    </div>
+                                </th>
+                                <th class="ref-header">參考價</th>
+                                <th class="strike-header" id="strike-th-btn" title="點擊切換升冪/降冪排序">
+                                    履約價 <span id="sort-symbol" style="font-size: 0.85rem; margin-left: 2px;">▾</span>
+                                </th>
+                                <th class="side-col">
+                                    <div class="side-inner">
+                                        <span class="col-price">價格</span>
+                                        <span class="col-strength">力道</span>
+                                        <span class="col-vol">總量</span>
+                                        <span class="col-code">空方目標</span>
+                                    </div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="t-quote-tbody">
+                            <tr>
+                                <td colspan="4" style="color: var(--text-secondary); padding: 20px;">載入中...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="ws-status-bar" style="margin-top: 6px;">
+                    <div class="status-indicator">
+                        <span class="indicator-dot" id="ws-dot"></span>
+                        <span id="ws-status-text">連線狀態: 初始化中...</span>
+                    </div>
+                    <div>更新時間: <span id="datetime" style="font-family: var(--font-mono);">--</span></div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Modal 視窗 -->
+    <div class="modal-overlay" id="api-modal">
+        <div class="modal-card">
+            <div class="modal-title">
+                <span>系統設定與 API 流量</span>
+                <button class="modal-close" id="btn-close-modal"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div class="form-group">
+                <label for="mode-select">金鑰模式</label>
+                <select id="mode-select">
+                    <option value="default">系統預設（開發測試）</option>
+                    <option value="custom">輸入模式（公開分享 / 自訂金鑰）</option>
+                </select>
+            </div>
+            <div class="form-group" id="group-api-key" style="display: none;">
+                <label for="input-api-key">API Key</label>
+                <input type="text" id="input-api-key" placeholder="請輸入您的 API Key">
+            </div>
+            <div class="form-group" id="group-secret-key" style="display: none;">
+                <label for="input-secret-key">Secret Key</label>
+                <input type="password" id="input-secret-key" placeholder="請輸入您的 Secret Key">
+            </div>
+
+            <hr style="border: 0; border-top: 1px solid var(--panel-border); margin: 4px 0;">
+
+            <div class="form-group">
+                <label><i class="fa-solid fa-chart-pie"></i> API 流量狀態 (Usage)</label>
+                <div class="usage-bar-container" id="usage-container">
+                    <div class="usage-progress-fill" id="usage-fill" style="width: 0%;"></div>
+                    <div class="usage-content" id="usage-text">正在查詢流量...</div>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-modal btn-cancel" id="btn-cancel-modal">取消</button>
+                <button class="btn-modal btn-save" id="btn-save-modal">儲存並重連</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script -->
+    <script>
+        const modal = document.getElementById('api-modal');
+        const btnOpen = document.getElementById('btn-open-modal');
+        const btnClose = document.getElementById('btn-close-modal');
+        const btnCancel = document.getElementById('btn-cancel-modal');
+        const btnSave = document.getElementById('btn-save-modal');
+        const modeSelect = document.getElementById('mode-select');
+        const groupApiKey = document.getElementById('group-api-key');
+        const groupSecretKey = document.getElementById('group-secret-key');
+        const inputApiKey = document.getElementById('input-api-key');
+        const inputSecretKey = document.getElementById('input-secret-key');
+        const usageText = document.getElementById('usage-text');
+        const usageFill = document.getElementById('usage-fill');
+
+        const txCard = document.getElementById('tx-card');
+        const txMetricsGrid = document.getElementById('tx-metrics-grid');
+        const txToggleIcon = document.getElementById('tx-toggle-icon');
+
+        const optionInfoCard = document.getElementById('option-info-card');
+        const optionCardTitleCode = document.getElementById('option-card-title-code');
+        const optionMetricsGrid = document.getElementById('option-metrics-grid');
+        const optionToggleIcon = document.getElementById('option-toggle-icon');
+
+        const btnModeStream = document.getElementById('btn-mode-stream');
+        const btnModeSnapshot = document.getElementById('btn-mode-snapshot');
+
+        let isStreamMode = true; // true = 即時模式, false = 快照模式
+
+        optionInfoCard.addEventListener('click', () => {
+            if (optionMetricsGrid.style.display === 'none') {
+                optionMetricsGrid.style.display = 'grid';
+                optionToggleIcon.style.transform = 'rotate(180deg)';
+            } else {
+                optionMetricsGrid.style.display = 'none';
+                optionToggleIcon.style.transform = 'rotate(0deg)';
+            }
+        });
+
+        btnModeStream.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (isStreamMode) return;
+            isStreamMode = true;
+            btnModeStream.classList.add('active');
+            btnModeSnapshot.classList.remove('active');
+            document.getElementById('ws-status-text').innerText = "連線狀態: 即時推送模式";
+        });
+
+        btnModeSnapshot.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (!isStreamMode) return;
+            isStreamMode = false;
+            btnModeSnapshot.classList.add('active');
+            btnModeStream.classList.remove('active');
+            document.getElementById('ws-status-text').innerText = "連線狀態: 快照模式（點擊重新整理）";
+            if (activeContractCode) {
+                loadStrikes(activeContractCode, currentHeaderLabel.innerText, null, currentAtmStrike);
+            }
+        });
+
+        const contractDropdown = document.getElementById('contract-dropdown');
+        const currentHeaderLabel = document.getElementById('current-header-label');
+        const strikeThBtn = document.getElementById('strike-th-btn');
+        const sortSymbol = document.getElementById('sort-symbol');
+
+        let currentStrikesData = []; 
+        let isAscending = false;    
+        let initialQuotesMap = {};  
+        let currentAtmStrike = null; 
+        let activeContractCode = ""; 
+        let currentBasis = 0;       
+
+        txCard.addEventListener('click', () => {
+            if (txMetricsGrid.style.display === 'none') {
+                txMetricsGrid.style.display = 'grid';
+                txToggleIcon.style.transform = 'rotate(180deg)';
+            } else {
+                txMetricsGrid.style.display = 'none';
+                txToggleIcon.style.transform = 'rotate(0deg)';
+            }
+        });
+
+        function toggleCustomInputs() {
+            if (modeSelect.value === 'custom') {
+                groupApiKey.style.display = 'flex';
+                groupSecretKey.style.display = 'flex';
+            } else {
+                groupApiKey.style.display = 'none';
+                groupSecretKey.style.display = 'none';
+            }
+        }
+
+        modeSelect.addEventListener('change', toggleCustomInputs);
+
+        async function fetchUsageData() {
+            try {
+                usageText.innerText = '正在查詢流量...';
+                usageFill.style.width = '0%';
+                
+                const mode = localStorage.getItem('shioaji_mode') || 'default';
+                let url = '/api/usage';
+                if (mode === 'custom') {
+                    const apiKey = localStorage.getItem('shioaji_api_key') || '';
+                    const secretKey = localStorage.getItem('shioaji_secret_key') || '';
+                    url += `?api_key=${encodeURIComponent(apiKey)}&secret_key=${encodeURIComponent(secretKey)}`;
+                }
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data.error || !data.limit_mb) {
+                    usageText.innerText = data.usage_str || '無法取得流量資訊';
+                } else {
+                    usageText.innerText = data.usage_str;
+                    const percent = Math.min(Math.max((data.used_mb / data.limit_mb) * 100, 0), 100);
+                    usageFill.style.width = `${percent}%`;
+                }
+            } catch (err) {
+                usageText.innerText = '無法連線取得流量資訊';
+            }
+        }
+
+        btnOpen.addEventListener('click', () => {
+            const savedMode = localStorage.getItem('shioaji_mode') || 'default';
+            modeSelect.value = savedMode;
+            inputApiKey.value = localStorage.getItem('shioaji_api_key') || '';
+            inputSecretKey.value = localStorage.getItem('shioaji_secret_key') || '';
+            toggleCustomInputs();
+            modal.style.display = 'flex';
+            fetchUsageData();
+        });
+
+        function closeModal() {
+            modal.style.display = 'none';
+        }
+
+        btnClose.addEventListener('click', closeModal);
+        btnCancel.addEventListener('click', closeModal);
+
+        btnSave.addEventListener('click', () => {
+            const mode = modeSelect.value;
+            localStorage.setItem('shioaji_mode', mode);
+            if (mode === 'custom') {
+                localStorage.setItem('shioaji_api_key', inputApiKey.value.trim());
+                localStorage.setItem('shioaji_secret_key', inputSecretKey.value.trim());
+            } else {
+                localStorage.removeItem('shioaji_api_key');
+                localStorage.removeItem('shioaji_secret_key');
+            }
+            closeModal();
+            location.reload();
+        });
+
+        function updateTargetPrices(strike, callCode, putCode) {
+            const callCodeEl = document.getElementById(`code-target-${callCode}`);
+            const putCodeEl = document.getElementById(`code-target-${putCode}`);
+            const refColEl = document.getElementById(`ref-col-${strike}`);
+
+            if (refColEl) {
+                const refVal = strike - currentBasis;
+                refColEl.innerText = Math.round(refVal);
+            }
+
+            if (callCode && callCodeEl) {
+                const cPriceEl = document.getElementById(`price-${callCode}`);
+                const cPrice = cPriceEl ? parseFloat(cPriceEl.innerText) : NaN;
+                if (!isNaN(cPrice) && cPrice > 0) {
+                    const targetVal = (strike + cPrice) - currentBasis;
+                    callCodeEl.innerText = Math.round(targetVal);
+                } else {
+                    callCodeEl.innerText = "--";
+                }
+            }
+
+            if (putCode && putCodeEl) {
+                const pPriceEl = document.getElementById(`price-${putCode}`);
+                const pPrice = pPriceEl ? parseFloat(pPriceEl.innerText) : NaN;
+                if (!isNaN(pPrice) && pPrice > 0) {
+                    const targetVal = (strike - pPrice) - currentBasis;
+                    putCodeEl.innerText = Math.round(targetVal);
+                } else {
+                    putCodeEl.innerText = "--";
+                }
+            }
+        }
+
+        function calculateAtmAndRender() {
+            if (!currentStrikesData || currentStrikesData.length === 0) return;
+
+            let minI = Infinity;
+            let atmStrike = null;
+
+            const txCloseEl = document.getElementById('tx-close');
+            let txPrice = 0;
+            if (txCloseEl && txCloseEl.innerText !== '--') {
+                txPrice = parseFloat(txCloseEl.innerText.replace(/,/g, ''));
+            }
+
+            currentStrikesData.forEach(item => {
+                if (item.call_code && item.put_code) {
+                    const cEl = document.getElementById(`price-${item.call_code}`);
+                    const pEl = document.getElementById(`price-${item.put_code}`);
+                    if (cEl && pEl) {
+                        const cPrice = parseFloat(cEl.innerText);
+                        const pPrice = parseFloat(pEl.innerText);
+                        if (!isNaN(cPrice) && !isNaN(pPrice) && cPrice > 0 && pPrice > 0) {
+                            const iVal = Math.abs(cPrice - pPrice);
+                            item.i_val = iVal;
+                            if (iVal < minI) {
+                                minI = iVal;
+                                atmStrike = item.strike;
+                            }
+                        }
+                    }
+                }
+            });
+
+            const atmDisplay = document.getElementById('atm-strike-display');
+            const iDisplay = document.getElementById('atm-ivalue-display');
+            const miniTxDisplay = document.getElementById('mini-tx-points');
+            const basisLabel = document.getElementById('basis-label');
+            const basisDisplay = document.getElementById('basis-display');
+
+            if (atmStrike !== null) {
+                atmDisplay.innerText = atmStrike;
+                iDisplay.innerText = Math.round(minI);
+                const miniTxPoints = atmStrike + minI;
+                miniTxDisplay.innerText = Math.round(miniTxPoints);
+
+                if (txPrice > 0) {
+                    currentBasis = miniTxPoints - txPrice;
+                    const absBasis = Math.abs(Math.round(currentBasis));
+
+                    if (currentBasis >= 0) {
+                        basisLabel.innerText = "正價差";
+                        basisDisplay.innerText = `+${absBasis}`;
+                        basisDisplay.style.color = "var(--red-down)";
+
+                        optionInfoCard.style.borderLeftColor = "var(--red-down)";
+                        optionCardTitleCode.style.color = "var(--red-down)";
+                        miniTxDisplay.style.color = "var(--red-down)";
+                    } else {
+                        basisLabel.innerText = "逆價差";
+                        basisDisplay.innerText = `-${absBasis}`;
+                        basisDisplay.style.color = "var(--green-up)";
+
+                        optionInfoCard.style.borderLeftColor = "var(--green-up)";
+                        optionCardTitleCode.style.color = "var(--green-up)";
+                        miniTxDisplay.style.color = "var(--green-up)";
+                    }
+                } else {
+                    currentBasis = 0;
+                    basisLabel.innerText = "價差";
+                    basisDisplay.innerText = "--";
+                    basisDisplay.style.color = "var(--text-primary)";
+                }
+
+                if (currentAtmStrike !== atmStrike) {
+                    currentAtmStrike = atmStrike;
+                    setTimeout(() => {
+                        if (activeContractCode && isStreamMode) {
+                            loadStrikes(activeContractCode, currentHeaderLabel.innerText, null, atmStrike);
+                        }
+                    }, 500);
+                }
+            } else {
+                atmDisplay.innerText = "--";
+                iDisplay.innerText = "--";
+                miniTxDisplay.innerText = "--";
+                basisLabel.innerText = "價差";
+                basisDisplay.innerText = "--";
+                basisDisplay.style.color = "var(--text-primary)";
+                currentBasis = 0;
+            }
+
+            currentStrikesData.forEach(item => {
+                updateTargetPrices(item.strike, item.call_code, item.put_code);
+            });
+
+            const tbody = document.getElementById('t-quote-tbody');
+            const rows = tbody.querySelectorAll('tr');
+            const sorted = [...currentStrikesData].sort((a, b) => isAscending ? a.strike - b.strike : b.strike - a.strike);
+
+            rows.forEach((tr, index) => {
+                const strikeCell = tr.querySelector('.strike-col');
+                const refCell = tr.querySelector('.ref-col');
+                if (sorted[index]) {
+                    if (sorted[index].strike === atmStrike) {
+                        if (strikeCell) strikeCell.classList.add('atm-strike');
+                        if (refCell) refCell.classList.add('atm-ref');
+                    } else {
+                        if (strikeCell) strikeCell.classList.remove('atm-strike');
+                        if (refCell) refCell.classList.remove('atm-ref');
+                    }
+                }
+            });
+        }
+
+        function renderStrikesTable() {
+            const tbody = document.getElementById('t-quote-tbody');
+            if (!currentStrikesData || currentStrikesData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" style="color: var(--text-secondary); padding: 20px;">無履約價資料</td></tr>`;
+                return;
+            }
+
+            const sorted = [...currentStrikesData].sort((a, b) => isAscending ? a.strike - b.strike : b.strike - a.strike);
+
+            if (isAscending) {
+                sortSymbol.innerText = "▴";
+                strikeThBtn.title = "目前為升冪排序（由小到大），點擊切換為降冪";
+            } else {
+                sortSymbol.innerText = "▾";
+                strikeThBtn.title = "目前為降冪排序（由大到小），點擊切換為升冪";
+            }
+
+            tbody.innerHTML = '';
+            sorted.forEach(item => {
+                const tr = document.createElement('tr');
+                const callCode = item.call_code || '';
+                const putCode = item.put_code || '';
+
+                const callData = initialQuotesMap[callCode] || { close: 0, total_volume: 0, strength: 0 };
+                const putData = initialQuotesMap[putCode] || { close: 0, total_volume: 0, strength: 0 };
+
+                let initialCallTarget = callData.close > 0 ? Math.round((item.strike + callData.close) - currentBasis) : "--";
+                let initialPutTarget = putData.close > 0 ? Math.round((item.strike - putData.close) - currentBasis) : "--";
+                let initialRef = Math.round(item.strike - currentBasis);
+
+                tr.innerHTML = `
+                    <td class="side-col">
+                        <div class="side-inner">
+                            <span class="col-code" id="code-target-${callCode || 'none'}">${initialCallTarget}</span>
+                            <span class="col-vol" id="vol-${callCode || 'none'}">${callData.total_volume > 0 ? callData.total_volume.toLocaleString() : '--'}</span>
+                            <span class="col-strength" id="strength-${callCode || 'none'}" style="color: ${callData.strength > 0 ? 'var(--red-down)' : (callData.strength < 0 ? 'var(--green-up)' : 'var(--text-primary)')};">${callData.strength !== undefined ? callData.strength : '--'}</span>
+                            <span class="col-price" id="price-${callCode || 'none'}">${callData.close > 0 ? callData.close : '--'}</span>
+                        </div>
+                    </td>
+                    <td class="ref-col" id="ref-col-${item.strike}">${initialRef}</td>
+                    <td class="strike-col">${item.strike}</td>
+                    <td class="side-col">
+                        <div class="side-inner">
+                            <span class="col-price" id="price-${putCode || 'none'}">${putData.close > 0 ? putData.close : '--'}</span>
+                            <span class="col-strength" id="strength-${putCode || 'none'}" style="color: ${putData.strength > 0 ? 'var(--red-down)' : (putData.strength < 0 ? 'var(--green-up)' : 'var(--text-primary)')};">${putData.strength !== undefined ? putData.strength : '--'}</span>
+                            <span class="col-vol" id="vol-${putCode || 'none'}">${putData.total_volume > 0 ? putData.total_volume.toLocaleString() : '--'}</span>
+                            <span class="col-code" id="code-target-${putCode || 'none'}">${initialPutTarget}</span>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            calculateAtmAndRender();
+        }
+
+        strikeThBtn.addEventListener('click', () => {
+            isAscending = !isAscending;
+            renderStrikesTable();
+        });
+
+        contractDropdown.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            if (!selectedOption.value) return;
+
+            const code = selectedOption.value;
+            const label = selectedOption.getAttribute('data-label');
+            const expiry = selectedOption.getAttribute('data-expiry');
+
+            document.querySelectorAll('.contract-tab').forEach(t => {
+                if (t.getAttribute('data-code') === code) {
+                    t.classList.add('active');
+                } else {
+                    t.classList.remove('active');
+                }
+            });
+
+            currentAtmStrike = null;
+            activeContractCode = code;
+            loadStrikes(code, label, expiry, null);
+        });
+
+        async function loadStrikes(code, label, expiryDate, customCenter = null) {
+            const subtitleEl = document.getElementById('t-table-subtitle');
+            const tbody = document.getElementById('t-quote-tbody');
+            
+            contractDropdown.value = code;
+            currentHeaderLabel.innerText = label;
+            activeContractCode = code;
+
+            if (expiryDate) {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const expiry = new Date(expiryDate);
+                expiry.setHours(0, 0, 0, 0);
+                const diffDays = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
+                const dayText = diffDays >= 0 ? `${diffDays}天` : '已到期';
+                subtitleEl.innerText = `(剩 ${dayText})`;
+            }
+
+            try {
+                let centerRef = customCenter ? customCenter : currentAtmStrike;
+                if (!centerRef) {
+                    const txCloseEl = document.getElementById('tx-close');
+                    if (txCloseEl && txCloseEl.innerText !== '--') {
+                        centerRef = parseFloat(txCloseEl.innerText.replace(/,/g, ''));
+                    }
+                }
+
+                const mode = localStorage.getItem('shioaji_mode') || 'default';
+                let url = `/api/t_quotes/${code}?current_index=${centerRef || 0}`;
+                if (mode === 'custom') {
+                    const apiKey = localStorage.getItem('shioaji_api_key') || '';
+                    const secretKey = localStorage.getItem('shioaji_secret_key') || '';
+                    url += `&api_key=${encodeURIComponent(apiKey)}&secret_key=${encodeURIComponent(secretKey)}`;
+                }
+
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data.error || !data.strikes || data.strikes.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="4" style="color: var(--red-down); padding: 20px;">載入履約價失敗: ${data.error || '無資料'}</td></tr>`;
+                    currentStrikesData = [];
+                    return;
+                }
+
+                currentStrikesData = data.strikes;
+                initialQuotesMap = data.initial_quotes || {};
+                renderStrikesTable();
+            } catch (err) {
+                console.error("載入履約價失敗:", err);
+                tbody.innerHTML = `<tr><td colspan="4" style="color: var(--red-down); padding: 20px;">網路連線錯誤</td></tr>`;
+                currentStrikesData = [];
+            }
+        }
+
+        async function loadContracts() {
+            try {
+                const response = await fetch('/api/contracts');
+                const contracts = await response.json();
+                
+                const tabsBar = document.getElementById('contract-tabs');
+                tabsBar.innerHTML = '';
+                contractDropdown.innerHTML = '<option value="" disabled>請選擇契約</option>';
+                
+                if (!contracts || contracts.length === 0) {
+                    tabsBar.innerHTML = '<span style="color:var(--text-secondary); padding:4px;">目前無可用選擇權合約</span>';
+                    return;
+                }
+                
+                contracts.forEach((item, index) => {
+                    const parts = item.expiry_date.split('-');
+                    const mmDd = `${parts[1]}-${parts[2]}`;
+                    
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    const expiry = new Date(item.expiry_date);
+                    expiry.setHours(0, 0, 0, 0);
+                    const diffTime = expiry - today;
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    const dayText = diffDays >= 0 ? `${diffDays}天` : '已到期';
+                    
+                    const btn = document.createElement('button');
+                    btn.className = `contract-tab ${index === 0 ? 'active' : ''}`;
+                    btn.setAttribute('data-code', item.code);
+                    btn.setAttribute('data-label', item.label);
+                    btn.setAttribute('data-expiry', item.expiry_date);
+                    btn.innerHTML = `
+                        <span class="tab-label">${item.label}</span>
+                        <span class="tab-date">${mmDd} (${dayText})</span>
+                    `;
+                    
+                    btn.addEventListener('click', function() {
+                        document.querySelectorAll('.contract-tab').forEach(t => t.classList.remove('active'));
+                        this.classList.add('active');
+                        const selectedCode = this.getAttribute('data-code');
+                        const label = this.getAttribute('data-label');
+                        const expiry = this.getAttribute('data-expiry');
+                        currentAtmStrike = null;
+                        activeContractCode = selectedCode;
+                        loadStrikes(selectedCode, label, expiry, null);
+                    });
+                    tabsBar.appendChild(btn);
+
+                    const opt = document.createElement('option');
+                    opt.value = item.code;
+                    opt.setAttribute('data-label', item.label);
+                    opt.setAttribute('data-expiry', item.expiry_date);
+                    opt.innerText = item.label;
+                    contractDropdown.appendChild(opt);
+                    
+                    if (index === 0) {
+                        activeContractCode = item.code;
+                        loadStrikes(item.code, item.label, item.expiry_date, null);
+                    }
+                });
+            } catch (err) {
+                console.error("載入合約清單失敗:", err);
+            }
+        }
+
+        function updateCandle(code, open, high, low, close) {
+            const wickEl = document.getElementById(`wick-${code}`);
+            const bodyEl = document.getElementById(`body-${code}`);
+            if (!wickEl || !bodyEl) return;
+
+            if (!open || !high || !low || !close) {
+                wickEl.style.backgroundColor = "var(--text-secondary)";
+                bodyEl.style.backgroundColor = "var(--text-secondary)";
+                wickEl.style.top = "1px";
+                wickEl.style.bottom = "1px";
+                bodyEl.style.top = "30%";
+                bodyEl.style.height = "40%";
+                return;
+            }
+
+            const isUp = close >= open;
+            const candleColor = isUp ? "var(--red-down)" : "var(--green-up)";
+            wickEl.style.backgroundColor = candleColor;
+            bodyEl.style.backgroundColor = candleColor;
+
+            const maxVal = Math.max(high, open, close);
+            const minVal = Math.min(low, open, close);
+            let totalSpan = maxVal - minVal;
+            if (totalSpan === 0) totalSpan = 1;
+
+            const bodyTopVal = Math.max(open, close);
+            const bodyBottomVal = Math.min(open, close);
+
+            const topPercent = ((maxVal - bodyTopVal) / totalSpan) * 100;
+            const heightPercent = Math.max(((bodyTopVal - bodyBottomVal) / totalSpan) * 100, 12);
+
+            bodyEl.style.top = `${topPercent}%`;
+            bodyEl.style.height = `${heightPercent}%`;
+        }
+
+        function updateSingleQuote(code, data) {
+            if (!isStreamMode && code !== "IX0001" && code !== "IX0043" && code !== "TXFR1") {
+                return;
+            }
+
+            const closeVal = data.close ? data.close.toLocaleString() : "--";
+            const pChg = data.price_chg || 0;
+            const pctChg = data.pct_chg || 0;
+            
+            const formattedChg = (pChg > 0 ? '+' : '') + pChg;
+            const formattedPct = (pctChg > 0 ? '+' : '') + Number(pctChg).toFixed(2);
+
+            let cssClass = "flat-text";
+            if (pChg > 0) {
+                cssClass = "up-text";
+            } else if (pChg < 0) {
+                cssClass = "down-text";
+            }
+
+            const priceEl = document.getElementById(`price-${code}`);
+            const chgEl = document.getElementById(`chg-${code}`);
+
+            if (priceEl) {
+                priceEl.innerText = closeVal;
+                priceEl.className = `market-price ${cssClass}`;
+            }
+            if (chgEl) {
+                chgEl.innerText = `${formattedChg} (${formattedPct}%)`;
+                chgEl.className = `market-change ${cssClass}`;
+            }
+
+            const tablePriceEl = document.getElementById(`price-${code}`);
+            const tableVolEl = document.getElementById(`vol-${code}`);
+            const tableStrEl = document.getElementById(`strength-${code}`);
+
+            if (tablePriceEl) tablePriceEl.innerText = data.close > 0 ? data.close : "--";
+            if (tableVolEl) tableVolEl.innerText = data.total_volume > 0 ? data.total_volume.toLocaleString() : "--";
+            if (tableStrEl && data.strength !== undefined) {
+                tableStrEl.innerText = data.strength;
+                tableStrEl.style.color = data.strength > 0 ? 'var(--red-down)' : (data.strength < 0 ? 'var(--green-up)' : 'var(--text-primary)');
+            }
+
+            calculateAtmAndRender();
+            updateCandle(code, data.open, data.high, data.low, data.close);
+
+            if (code === "TXFR1") {
+                document.getElementById('tx-close').innerText = closeVal;
+                document.getElementById('tx-total_volume').innerText = data.total_volume ? data.total_volume.toLocaleString() : "--";
+                document.getElementById('tx-open').innerText = data.open ? data.open.toLocaleString() : "--";
+                document.getElementById('tx-high').innerText = data.high ? data.high.toLocaleString() : "--";
+                document.getElementById('tx-low').innerText = data.low ? data.low.toLocaleString() : "--";
+                
+                const avgPriceVal = data.avg_price ? Math.round(data.avg_price).toLocaleString() : "--";
+                document.getElementById('tx-avg-price').innerText = avgPriceVal;
+
+                document.getElementById('tx-bid-vol').innerText = data.bid_side_total_vol ? data.bid_side_total_vol.toLocaleString() : "0";
+                document.getElementById('tx-ask-vol').innerText = data.ask_side_total_vol ? data.ask_side_total_vol.toLocaleString() : "0";
+
+                document.getElementById('tx-price_chg').innerText = formattedChg;
+                document.getElementById('tx-pct_chg').innerText = formattedPct;
+
+                document.getElementById('tx-close').className = `big-price ${cssClass}`;
+                document.getElementById('tx-chg-container').className = `change-line ${cssClass}`;
+            }
+        }
+
+        function startTopClock() {
+            setInterval(() => {
+                const now = new Date();
+                const hours = String(now.getHours()).padStart(2, '0');
+                const mins = String(now.getMinutes()).padStart(2, '0');
+                const secs = String(now.getSeconds()).padStart(2, '0');
+                document.getElementById('top-clock').innerText = `${hours}:${mins}:${secs}`;
+            }, 1000);
+        }
+
+        function initWebSocket() {
+            const wsDot = document.getElementById('ws-dot');
+            const wsStatusText = document.getElementById('ws-status-text');
+
+            try {
+                const wsUrl = `ws://${location.host}/ws/quote`;
+                const ws = new WebSocket(wsUrl);
+
+                ws.onopen = function() {
+                    wsDot.className = "indicator-dot online";
+                    wsStatusText.innerText = "連線狀態: 即時推送模式";
+                };
+
+                ws.onmessage = function(event) {
+                    try {
+                        const data = JSON.parse(event.data);
+                        if (data && data.code) {
+                            updateSingleQuote(data.code, data);
+                        }
+                    } catch (e) {
+                        console.error("解析 WebSocket 資料失敗:", e);
+                    }
+                };
+
+                ws.onerror = function() {
+                    wsDot.className = "indicator-dot offline";
+                    wsStatusText.innerText = "連線狀態: 未連接至伺服器";
+                };
+
+                ws.onclose = function() {
+                    wsDot.className = "indicator-dot offline";
+                    wsStatusText.innerText = "連線狀態: WebSocket 已中斷";
+                };
+            } catch (err) {
+                wsDot.className = "indicator-dot offline";
+                wsStatusText.innerText = "連線狀態: 本地預覽";
+            }
+        }
+
+        window.onload = async function() {
+            startTopClock();
+            await loadContracts();
+            initWebSocket();
+        };
+    </script>
+</body>
+</html>
