@@ -1844,7 +1844,9 @@
             const wsStatusText = document.getElementById('ws-status-text');
 
             try {
-                const wsUrl = `ws://${location.host}/ws/quote`;
+                const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+                const wsUrl = `${protocol}//${location.host}/ws/quote`;
+                //const wsUrl = `ws://${location.host}/ws/quote`;
                 const ws = new WebSocket(wsUrl);
 
                 ws.onopen = function() {
