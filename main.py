@@ -1,7 +1,7 @@
 import asyncio
 from datetime import date
 from typing import Optional
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Query
 from fastapi.responses import FileResponse
 import shioaji as sj
 
@@ -54,7 +54,7 @@ root_display_map = {
     "TX1": "W1", "TX2": "W2", "TXO": "O", "TX4": "W4", "TX5": "W5",
 }
 
-def get_filtered_contracts(custom_api_key=None, custom_secret_key=None):
+def get_filtered_contracts(custom_api_key=None, custom_secret_key=None, filter_expired: bool = False):
     try:
         target_api = api
         if custom_api_key and custom_secret_key:
@@ -64,12 +64,13 @@ def get_filtered_contracts(custom_api_key=None, custom_secret_key=None):
         today = date.today()
         
         fridays, wednesdays, monthlies = [], [], []
+        expired_options = []
         
         for opt in options:
             if not opt.code.startswith("TX"):
                 continue
             info = target_api.contracts.info(opt)
-            if not info or info.delivery_date < today:
+            if not info:
                 continue
             
             root = info.root
@@ -84,17 +85,30 @@ def get_filtered_contracts(custom_api_key=None, custom_secret_key=None):
             
             if root in ["TXU", "TXV", "TXX", "TXY", "TXZ"]:
                 label = f"{year_str}/{month_str}{root_display_map[root]}"
-                fridays.append((info.delivery_date, opt.code, label))
+                item = (info.delivery_date, opt.code, label)
+                if info.delivery_date >= today:
+                    fridays.append(item)
+                else:
+                    expired_options.append(item)
             elif root in ["TX1", "TX2", "TX4", "TX5"]:
                 label = f"{year_str}/{month_str}{root_display_map[root]}"
-                wednesdays.append((info.delivery_date, opt.code, label))
+                item = (info.delivery_date, opt.code, label)
+                if info.delivery_date >= today:
+                    wednesdays.append(item)
+                else:
+                    expired_options.append(item)
             elif root == "TXO":
                 label = f"{year_str}/{month_str}O"
-                monthlies.append((info.delivery_date, opt.code, label))
+                item = (info.delivery_date, opt.code, label)
+                if info.delivery_date >= today:
+                    monthlies.append(item)
+                else:
+                    expired_options.append(item)
         
         fridays.sort(key=lambda x: x[0])
         wednesdays.sort(key=lambda x: x[0])
         monthlies.sort(key=lambda x: x[0])
+        expired_options.sort(key=lambda x: x[0], reverse=True)
         
         def pick_unique(items, count):
             seen_dates = set()
@@ -110,8 +124,12 @@ def get_filtered_contracts(custom_api_key=None, custom_secret_key=None):
         selected_fridays = pick_unique(fridays, 2)
         selected_wednesdays = pick_unique(wednesdays, 2)
         selected_monthlies = pick_unique(monthlies, 1)
-        
         combined = selected_fridays + selected_wednesdays + selected_monthlies
+            
+        if not filter_expired and expired_options:
+            d, code, label = expired_options[0]
+            combined.append({"delivery_date": d, "code": code, "label": label})
+            
         combined.sort(key=lambda x: x["delivery_date"])
         
         return [{
@@ -124,8 +142,8 @@ def get_filtered_contracts(custom_api_key=None, custom_secret_key=None):
         return []
 
 @app.get("/api/contracts")
-async def get_contracts(api_key: Optional[str] = None, secret_key: Optional[str] = None):
-    return get_filtered_contracts(api_key, secret_key)
+async def get_contracts(api_key: Optional[str] = None, secret_key: Optional[str] = None, filter_expired: bool = False):
+    return get_filtered_contracts(api_key, secret_key, filter_expired)
 
 @app.get("/api/t_quotes/{code}")
 async def get_t_quotes(code: str, current_index: Optional[float] = None, api_key: Optional[str] = None, secret_key: Optional[str] = None):
@@ -224,7 +242,6 @@ async def get_t_quotes(code: str, current_index: Optional[float] = None, api_key
                                 "strength": strength
                             }
                             initial_quotes[snap.code] = q_info
-                            # 同步快照至 latest_quotes，支援休市時不顯示 -
                             latest_quotes[snap.code] = {
                                 "type": "quote",
                                 "code": snap.code,
