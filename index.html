@@ -29,7 +29,6 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            /* 防止手機瀏覽器長按選取文字干擾滑動 */
             -webkit-user-select: none;
             user-select: none;
             -webkit-touch-callout: none;
@@ -1139,10 +1138,10 @@
             </div>
 
             <div class="form-group">
-                <label for="filter-expired-select">已結算合約顯示設定</label>
+                <label for="filter-expired-select">選擇權合約設定</label>
                 <select id="filter-expired-select">
-                    <option value="false">顯示最近一個已結算合約（預設未過濾）</option>
-                    <option value="true">過濾已結算合約（僅顯示近期未到期合約）</option>
+                    <option value="false">顯示最近已結算合約</option>
+                    <option value="true">過濾已結算合約</option>
                 </select>
             </div>
 
@@ -1577,6 +1576,15 @@
 
             bindGlobalSymmetricScroll();
             calculateAtmAndRender();
+
+            // 強制初始化對齊，解決初次載入欄位跑掉的問題
+            setTimeout(() => {
+                const callHeader = document.getElementById('call-header-scroll');
+                if (callHeader) {
+                    callHeader.scrollLeft = 0;
+                    callHeader.dispatchEvent(new Event('scroll'));
+                }
+            }, 50);
         }
 
         contractDropdown.addEventListener('change', function() {
@@ -1693,7 +1701,8 @@
                     btn.className = `contract-tab ${index === 0 ? 'active' : ''}`;
                     btn.setAttribute('data-code', item.code);
                     btn.setAttribute('data-label', item.label);
-                    btn.setAttribute('data-expiry', item.delivery_date);
+                    // 修正：正確讀取 item.expiry_date
+                    btn.setAttribute('data-expiry', item.expiry_date);
                     btn.innerHTML = `
                         <span class="tab-label">${item.label}</span>
                         <span class="tab-date">${mmDd} (${dayText})</span>
@@ -1720,6 +1729,7 @@
                     
                     if (index === 0) {
                         activeContractCode = item.code;
+                        // 修正：正確讀取 item.expiry_date
                         loadStrikes(item.code, item.label, item.expiry_date, null);
                     }
                 });
@@ -1846,7 +1856,6 @@
             try {
                 const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
                 const wsUrl = `${protocol}//${location.host}/ws/quote`;
-                //const wsUrl = `ws://${location.host}/ws/quote`;
                 const ws = new WebSocket(wsUrl);
 
                 ws.onopen = function() {
