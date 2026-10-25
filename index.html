@@ -29,6 +29,10 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            /* 防止手機瀏覽器長按選取文字干擾滑動 */
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
         }
 
         html, body {
@@ -1689,7 +1693,7 @@
                     btn.className = `contract-tab ${index === 0 ? 'active' : ''}`;
                     btn.setAttribute('data-code', item.code);
                     btn.setAttribute('data-label', item.label);
-                    btn.setAttribute('data-expiry', item.expiry_date);
+                    btn.setAttribute('data-expiry', item.delivery_date);
                     btn.innerHTML = `
                         <span class="tab-label">${item.label}</span>
                         <span class="tab-date">${mmDd} (${dayText})</span>
