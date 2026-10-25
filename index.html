@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Shioaji 即時報價看板 - Trading Terminal</title>
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -31,24 +31,29 @@
             padding: 0;
         }
 
-        body {
+        html, body {
             background-color: var(--bg-dark);
             color: var(--text-primary);
             font-family: var(--font-main);
-            font-size: clamp(10px, 1.1vw, 12px);
-            line-height: 1.3;
+            font-size: 13px;
+            line-height: 1.35;
             -webkit-font-smoothing: antialiased;
-            padding: clamp(4px, 1vw, 8px);
+            overflow-x: hidden;
+            width: 100%;
+            max-width: 100vw;
+            touch-action: pan-y;
+            padding: clamp(6px, 1vw, 10px);
             min-height: 100vh;
         }
 
         .container {
             width: 100%;
             max-width: 100%;
+            overflow-x: hidden;
             margin: 0 auto;
             display: flex;
             flex-direction: column;
-            gap: clamp(4px, 1vw, 8px);
+            gap: clamp(6px, 1vw, 10px);
         }
 
         /* 1. Top Bar */
@@ -56,7 +61,7 @@
             background-color: #08090c;
             border: 1px solid var(--panel-border);
             border-radius: 4px;
-            padding: 6px clamp(8px, 1.2vw, 14px);
+            padding: 8px clamp(10px, 1.2vw, 16px);
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -67,12 +72,12 @@
         .top-bar-left {
             display: flex;
             align-items: center;
-            gap: clamp(6px, 1vw, 12px);
+            gap: clamp(8px, 1.2vw, 14px);
             flex-wrap: wrap;
         }
 
         .brand-logo {
-            font-size: clamp(0.9rem, 1.2vw, 1.15rem);
+            font-size: 1.15rem;
             font-weight: 800;
             color: #ffffff;
             display: flex;
@@ -82,7 +87,7 @@
         }
 
         .brand-subtitle {
-            font-size: clamp(0.68rem, 0.8vw, 0.8rem);
+            font-size: 0.82rem;
             color: var(--text-secondary);
             font-weight: 400;
             margin-left: 2px;
@@ -93,25 +98,25 @@
             color: var(--green-up);
             border: 1px solid rgba(0, 192, 118, 0.3);
             border-radius: 8px;
-            padding: 1px 6px;
-            font-size: clamp(0.65rem, 0.75vw, 0.72rem);
+            padding: 2px 8px;
+            font-size: 0.78rem;
             font-weight: 600;
             display: inline-flex;
             align-items: center;
-            gap: 3px;
+            gap: 4px;
         }
 
         .status-dot-text {
             color: var(--text-secondary);
-            font-size: clamp(0.68rem, 0.8vw, 0.78rem);
+            font-size: 0.82rem;
             display: flex;
             align-items: center;
             gap: 5px;
         }
 
         .status-dot-yellow {
-            width: 6px;
-            height: 6px;
+            width: 7px;
+            height: 7px;
             background-color: var(--accent-gold);
             border-radius: 50%;
             display: inline-block;
@@ -136,9 +141,9 @@
             background: transparent;
             border: none;
             color: var(--text-secondary);
-            font-size: 0.7rem;
+            font-size: 0.78rem;
             font-weight: 600;
-            padding: 3px 9px;
+            padding: 4px 10px;
             border-radius: 10px;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -158,7 +163,7 @@
             color: var(--accent-gold);
             padding: 5px 10px;
             border-radius: 4px;
-            font-size: 0.95rem;
+            font-size: 1rem;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -176,7 +181,7 @@
             display: flex;
             flex-direction: row;
             flex-wrap: nowrap;
-            gap: clamp(4px, 0.8vw, 8px);
+            gap: clamp(6px, 1vw, 10px);
             width: 100%;
         }
 
@@ -184,10 +189,10 @@
             background-color: var(--panel-bg);
             border: 1px solid var(--panel-border);
             border-radius: 4px;
-            padding: clamp(4px, 0.8vw, 8px) clamp(6px, 1vw, 10px);
+            padding: 8px 10px;
             display: flex;
             flex-direction: column;
-            gap: 2px;
+            gap: 4px;
             flex: 1 1 0;
             min-width: 0;
             overflow: hidden;
@@ -196,7 +201,7 @@
         .market-card-title {
             color: var(--accent-gold);
             font-weight: 700;
-            font-size: clamp(0.7rem, 0.9vw, 0.82rem);
+            font-size: 0.85rem;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -217,8 +222,8 @@
         }
 
         .mini-candle {
-            width: clamp(10px, 1.2vw, 14px);
-            height: clamp(22px, 2.5vw, 28px);
+            width: 14px;
+            height: 28px;
             position: relative;
             display: flex;
             justify-content: center;
@@ -249,7 +254,7 @@
         }
 
         .market-price {
-            font-size: clamp(0.85rem, 1.4vw, 1.15rem);
+            font-size: 1.15rem;
             font-weight: 800;
             font-family: var(--font-mono);
             line-height: 1.1;
@@ -259,7 +264,7 @@
         }
 
         .market-change {
-            font-size: clamp(0.62rem, 0.85vw, 0.75rem);
+            font-size: 0.78rem;
             font-family: var(--font-mono);
             font-weight: 600;
             white-space: nowrap;
@@ -274,18 +279,19 @@
         /* 3. Contract Switch Tabs */
         .contract-tabs-bar {
             display: flex;
-            gap: 6px;
+            gap: 4px;
             overflow-x: auto;
-            padding-bottom: 4px;
-            min-height: 38px;
+            padding-bottom: 3px;
+            min-height: 32px;
+            -webkit-overflow-scrolling: touch;
         }
 
         .contract-tab {
             background-color: var(--panel-bg);
             border: 1px solid var(--panel-border);
             color: var(--text-secondary);
-            padding: 5px 12px;
-            border-radius: 12px;
+            padding: 3px 8px;
+            border-radius: 10px;
             cursor: pointer;
             white-space: nowrap;
             transition: all 0.2s;
@@ -293,18 +299,18 @@
             display: inline-flex;
             flex-direction: column;
             align-items: center;
-            gap: 2px;
+            gap: 1px;
             flex-shrink: 0;
         }
 
         .contract-tab .tab-label {
-            font-size: clamp(0.75rem, 0.9vw, 0.85rem);
+            font-size: 0.8rem;
             font-weight: 700;
             color: var(--text-primary);
         }
 
         .contract-tab .tab-date {
-            font-size: clamp(0.6rem, 0.7vw, 0.68rem);
+            font-size: 0.62rem;
             color: var(--text-secondary);
         }
 
@@ -330,11 +336,12 @@
             background-color: var(--panel-bg);
             border: 1px solid var(--panel-border);
             border-radius: 4px;
-            padding: clamp(8px, 1.2vw, 14px) clamp(10px, 1.5vw, 16px);
+            padding: clamp(10px, 1.4vw, 16px);
             display: flex;
             flex-direction: column;
-            gap: clamp(6px, 1vw, 10px);
+            gap: clamp(8px, 1.2vw, 12px);
             width: 100%;
+            overflow: hidden;
         }
 
         .clickable-card {
@@ -355,7 +362,7 @@
         }
 
         .symbol-title-area .symbol-code {
-            font-size: clamp(0.85rem, 1.2vw, 1rem);
+            font-size: 1.05rem;
             font-weight: 800;
             color: var(--accent-gold);
             font-family: var(--font-mono);
@@ -370,7 +377,7 @@
         }
 
         .big-price {
-            font-size: clamp(1.2rem, 2.0vw, 1.6rem);
+            font-size: 1.6rem;
             font-weight: 800;
             font-family: var(--font-mono);
             line-height: 1.1;
@@ -378,7 +385,7 @@
         }
 
         .change-line {
-            font-size: clamp(0.68rem, 0.9vw, 0.78rem);
+            font-size: 0.82rem;
             font-family: var(--font-mono);
             font-weight: 600;
             margin-top: 2px;
@@ -394,12 +401,12 @@
             border-left: 1px solid #1e222d;
         }
         .vol-label {
-            font-size: clamp(0.58rem, 0.68vw, 0.65rem);
+            font-size: 0.7rem;
             color: var(--text-secondary);
             margin-bottom: 2px;
         }
         .vol-value {
-            font-size: clamp(0.95rem, 1.3vw, 1.1rem);
+            font-size: 1.15rem;
             font-weight: 800;
             font-family: var(--font-mono);
             color: var(--text-primary);
@@ -408,7 +415,7 @@
         .metrics-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: clamp(4px, 0.8vw, 8px);
+            gap: 8px;
             margin-top: 4px;
             padding-top: 8px;
             border-top: 1px dashed #2a2e39;
@@ -418,63 +425,91 @@
             background-color: var(--card-inner-bg);
             border: 1px solid #232733;
             border-radius: 3px;
-            padding: clamp(4px, 0.8vw, 8px);
+            padding: 6px 8px;
             text-align: center;
         }
 
         .metric-label {
-            font-size: clamp(0.62rem, 0.72vw, 0.68rem);
+            font-size: 0.72rem;
             color: var(--text-secondary);
             margin-bottom: 2px;
         }
 
         .metric-value {
-            font-size: clamp(0.82rem, 1.2vw, 1.05rem);
+            font-size: 1rem;
             font-weight: 700;
             font-family: var(--font-mono);
             color: var(--text-primary);
         }
 
-        /* T-Quote Table Header 買權與賣權樣式 */
+        /* T-Quote Table Header */
         .t-quote-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             background-color: #181c27;
-            padding: 8px 12px;
+            padding: 8px 10px;
             border-radius: 4px;
             font-weight: 700;
             font-size: 0.88rem;
             margin-bottom: 6px;
-            gap: 8px;
+            gap: 6px;
+            width: 100%;
         }
 
         .header-badge-call {
             background-color: var(--red-down);
             color: #ffffff;
-            padding: 6px 12px;
+            padding: 6px 10px;
             border-radius: 4px;
             text-align: center;
             font-weight: 800;
             letter-spacing: 0.5px;
-            width: 37%;
-            font-size: 0.82rem;
+            flex: 1;
+            min-width: 0;
+            font-size: 0.88rem;
             box-shadow: 0 2px 4px rgba(246, 70, 93, 0.3);
-            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .header-badge-put {
             background-color: var(--green-up);
             color: #ffffff;
-            padding: 6px 12px;
+            padding: 6px 10px;
             border-radius: 4px;
             text-align: center;
             font-weight: 800;
             letter-spacing: 0.5px;
-            width: 37%;
-            font-size: 0.82rem;
+            flex: 1;
+            min-width: 0;
+            font-size: 0.88rem;
             box-shadow: 0 2px 4px rgba(0, 192, 118, 0.3);
-            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .scroll-arrow-btn {
+            background: rgba(0, 0, 0, 0.25);
+            border: none;
+            color: #ffffff;
+            font-size: 0.85rem;
+            padding: 1px 6px;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: background 0.2s;
+            user-select: none;
+        }
+        .scroll-arrow-btn:hover {
+            background: rgba(0, 0, 0, 0.5);
         }
 
         .t-quote-title-container {
@@ -485,21 +520,26 @@
             text-align: center;
             position: relative;
             flex: 0 0 auto;
-            padding: 0 6px;
+            padding: 0 4px;
+            max-width: 40%;
         }
         .t-table-main-title {
             color: var(--accent-gold);
             font-family: var(--font-mono);
-            font-size: 0.88rem;
+            font-size: 0.92rem;
             display: flex;
             align-items: center;
             gap: 4px;
             cursor: pointer;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .t-table-sub-title {
             color: var(--text-secondary);
-            font-size: 0.68rem;
+            font-size: 0.72rem;
             font-family: var(--font-mono);
+            white-space: nowrap;
         }
         .contract-select-overlay {
             position: absolute;
@@ -510,11 +550,11 @@
 
         /* T字表捲軸容器 */
         .t-table-container {
-            max-height: 450px;
+            max-height: 480px;
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
-        /* 螢幕寬高縮小時：僅針對契約水平膠囊與 T 字表垂直滑桿調整為半透明纖細不顯眼 */
         @media (max-width: 1200px), (max-height: 800px) {
             .contract-tabs-bar::-webkit-scrollbar,
             .t-table-container::-webkit-scrollbar {
@@ -538,9 +578,10 @@
 
         .t-quote-table {
             width: 100%;
+            table-layout: fixed;
             border-collapse: collapse;
             font-family: var(--font-mono);
-            font-size: 0.72rem;
+            font-size: 0.8rem;
         }
         
         .t-quote-table th {
@@ -549,52 +590,111 @@
             z-index: 5;
             background-color: #181c27;
             color: #ffffff;
-            padding: 6px 2px;
-            font-size: 0.7rem;
+            padding: 7px 2px;
+            font-size: 0.78rem;
             font-weight: 700;
             border-bottom: 1px solid var(--panel-border);
             vertical-align: middle;
+            white-space: nowrap;
         }
         
-        .t-quote-table th.strike-header {
+        .t-quote-table th.center-toggle-header {
             cursor: pointer;
             user-select: none;
             transition: color 0.2s;
-            width: 14%;
+            width: 20%;
             text-align: center;
             color: var(--accent-gold);
+            background-color: #181c27;
         }
-        .t-quote-table th.strike-header:hover {
+        .t-quote-table th.center-toggle-header:hover {
             color: #ffffff;
+            background-color: #232733;
         }
-        .t-quote-table th.ref-header {
-            width: 12%;
-            text-align: center;
-            color: var(--accent-gold);
-        }
+
         .t-quote-table td {
-            padding: 4px 2px;
+            padding: 5px 1px;
             text-align: center;
             border-bottom: 1px solid #1a1e29;
             vertical-align: middle;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         
-        .strike-col {
-            color: var(--text-primary);
-            font-weight: 700;
-            background-color: #181c27;
-            text-align: center;
-            font-size: 0.76rem;
-            width: 14%;
-        }
-
-        .ref-col {
+        .center-col {
             color: var(--accent-gold);
             font-weight: 800;
             background-color: #181c27;
             text-align: center;
-            font-size: 0.76rem;
-            width: 12%;
+            font-size: 0.85rem;
+            width: 20%;
+            cursor: pointer;
+            user-select: none;
+            transition: background-color 0.2s;
+        }
+        .center-col:hover {
+            background-color: #232733;
+        }
+
+        .side-col {
+            width: 40%;
+            padding: 0 !important;
+            overflow: hidden;
+        }
+
+        /* 支援內部橫向捲動與鏡射對稱同步 */
+        .side-scroll-box {
+            width: 100%;
+            overflow-x: auto;
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        .side-scroll-box::-webkit-scrollbar {
+            display: none;
+        }
+
+        .side-inner {
+            display: grid;
+            grid-template-columns: 28% 24% 22% 26%;
+            align-items: center;
+            min-width: 240px; 
+            padding: 0 2px;
+            gap: 1px;
+        }
+        
+        .col-code {
+            color: var(--text-secondary);
+            font-size: 0.72rem;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .col-vol {
+            color: #ffffff;
+            font-size: 0.78rem;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .col-strength {
+            color: #ffffff;
+            font-size: 0.78rem;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .col-price {
+            font-weight: 700;
+            color: #ffffff;
+            font-size: 0.82rem;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .atm-strike {
@@ -603,57 +703,14 @@
             font-weight: 900;
             box-shadow: inset 0 0 8px rgba(0,0,0,0.3);
         }
-        .atm-ref {
-            background-color: var(--accent-gold) !important;
-            color: #000000 !important;
-            font-weight: 900;
-            box-shadow: inset 0 0 8px rgba(0,0,0,0.3);
-        }
-
-        .side-col {
-            width: 37%;
-        }
-
-        .side-inner {
-            display: grid;
-            grid-template-columns: 36% 20% 20% 24%;
-            align-items: center;
-            width: 100%;
-            padding: 0 2px;
-        }
-        
-        .col-code {
-            color: var(--text-secondary);
-            font-size: 0.65rem;
-            text-align: center;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .col-vol {
-            color: #ffffff;
-            font-size: 0.7rem;
-            text-align: center;
-        }
-        .col-strength {
-            color: #ffffff;
-            font-size: 0.7rem;
-            text-align: center;
-        }
-        .col-price {
-            font-weight: 700;
-            color: #ffffff;
-            font-size: 0.72rem;
-            text-align: center;
-        }
 
         .ws-status-bar {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            font-size: clamp(0.65rem, 0.75vw, 0.72rem);
+            font-size: 0.78rem;
             color: var(--text-muted);
-            padding-top: 4px;
+            padding-top: 6px;
             border-top: 1px dashed #232733;
             flex-wrap: wrap;
             gap: 4px;
@@ -666,8 +723,8 @@
         }
 
         .indicator-dot {
-            width: 5px;
-            height: 5px;
+            width: 6px;
+            height: 6px;
             border-radius: 50%;
             background-color: #666;
         }
@@ -679,6 +736,23 @@
 
         .indicator-dot.offline {
             background-color: var(--accent-gold);
+        }
+
+        @media (max-width: 768px) {
+            html, body {
+                font-size: 12px;
+                padding: 4px;
+            }
+            .brand-logo { font-size: 1.05rem; }
+            .market-price { font-size: 1.05rem; }
+            .big-price { font-size: 1.4rem; }
+            .t-quote-table th { font-size: 0.72rem; padding: 5px 1px; }
+            .center-col { font-size: 0.8rem; }
+            .col-code { font-size: 0.65rem; }
+            .col-vol, .col-strength { font-size: 0.72rem; }
+            .col-price { font-size: 0.75rem; }
+            .contract-tab .tab-label { font-size: 0.75rem; }
+            .contract-tab .tab-date { font-size: 0.6rem; }
         }
 
         /* Modal Popup */
@@ -719,7 +793,7 @@
             gap: 4px;
         }
         .form-group label {
-            font-size: 0.75rem;
+            font-size: 0.78rem;
             color: var(--text-secondary);
         }
         .form-group input, .form-group select {
@@ -729,7 +803,7 @@
             padding: 6px 8px;
             border-radius: 4px;
             font-family: var(--font-mono);
-            font-size: 0.8rem;
+            font-size: 0.85rem;
         }
 
         .usage-bar-container {
@@ -740,7 +814,7 @@
             overflow: hidden;
             padding: 8px;
             font-family: var(--font-mono);
-            font-size: 0.78rem;
+            font-size: 0.8rem;
             color: var(--text-primary);
         }
         .usage-progress-fill {
@@ -766,9 +840,9 @@
             margin-top: 4px;
         }
         .btn-modal {
-            padding: 4px 12px;
+            padding: 5px 14px;
             border-radius: 4px;
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             font-weight: 600;
             cursor: pointer;
         }
@@ -799,7 +873,6 @@
                 </div>
             </div>
             <div class="top-bar-right">
-                <!-- 即時 / 快照切換按鈕組 -->
                 <div class="mode-toggle-group">
                     <button class="mode-btn active" id="btn-mode-stream" title="即時連續推送更新">
                         <i class="fa-solid fa-bolt"></i> 即時
@@ -965,7 +1038,11 @@
             <!-- 選擇權 T 字表 -->
             <div class="main-card">
                 <div class="t-quote-header">
-                    <div class="header-badge-call">買權 CALL</div>
+                    <div class="header-badge-call">
+                        <button class="scroll-arrow-btn" onclick="stepScroll(-1)" title="向左滑動">◂</button>
+                        <span>買權 CALL</span>
+                        <button class="scroll-arrow-btn" onclick="stepScroll(1)" title="向右滑動">▸</button>
+                    </div>
                     
                     <div class="t-quote-title-container">
                         <div class="t-table-main-title">
@@ -977,7 +1054,11 @@
                         <select id="contract-dropdown" class="contract-select-overlay" title="選擇契約"></select>
                     </div>
 
-                    <div class="header-badge-put">賣權 PUT</div>
+                    <div class="header-badge-put">
+                        <button class="scroll-arrow-btn" onclick="stepScroll(-1)" title="向左滑動">◂</button>
+                        <span>賣權 PUT</span>
+                        <button class="scroll-arrow-btn" onclick="stepScroll(1)" title="向右滑動">▸</button>
+                    </div>
                 </div>
 
                 <div class="t-table-container">
@@ -985,30 +1066,33 @@
                         <thead>
                             <tr>
                                 <th class="side-col">
-                                    <div class="side-inner">
-                                        <span class="col-code">多方目標</span>
-                                        <span class="col-vol">總量</span>
-                                        <span class="col-strength">力道</span>
-                                        <span class="col-price">價格</span>
+                                    <div class="side-scroll-box" id="call-header-scroll">
+                                        <div class="side-inner">
+                                            <span class="col-code">多方目標</span>
+                                            <span class="col-vol">總量</span>
+                                            <span class="col-strength">力道</span>
+                                            <span class="col-price">價格</span>
+                                        </div>
                                     </div>
                                 </th>
-                                <th class="ref-header">參考價</th>
-                                <th class="strike-header" id="strike-th-btn" title="點擊切換升冪/降冪排序">
-                                    履約價 <span id="sort-symbol" style="font-size: 0.85rem; margin-left: 2px;">▾</span>
+                                <th class="center-toggle-header" id="center-th-btn" title="點擊切換 履約價 / 參考價">
+                                    <span id="center-header-text">履約價</span> <span style="font-size: 0.85rem; margin-left: 2px;">↕</span>
                                 </th>
                                 <th class="side-col">
-                                    <div class="side-inner">
-                                        <span class="col-price">價格</span>
-                                        <span class="col-strength">力道</span>
-                                        <span class="col-vol">總量</span>
-                                        <span class="col-code">空方目標</span>
+                                    <div class="side-scroll-box" id="put-header-scroll">
+                                        <div class="side-inner">
+                                            <span class="col-price">價格</span>
+                                            <span class="col-strength">力道</span>
+                                            <span class="col-vol">總量</span>
+                                            <span class="col-code">空方目標</span>
+                                        </div>
                                     </div>
                                 </th>
                             </tr>
                         </thead>
                         <tbody id="t-quote-tbody">
                             <tr>
-                                <td colspan="4" style="color: var(--text-secondary); padding: 20px;">載入中...</td>
+                                <td colspan="3" style="color: var(--text-secondary); padding: 20px;">載入中...</td>
                             </tr>
                         </tbody>
                     </table>
@@ -1050,6 +1134,14 @@
                 <input type="password" id="input-secret-key" placeholder="請輸入您的 Secret Key">
             </div>
 
+            <div class="form-group">
+                <label for="filter-expired-select">已結算合約顯示設定</label>
+                <select id="filter-expired-select">
+                    <option value="false">顯示最近一個已結算合約（預設未過濾）</option>
+                    <option value="true">過濾已結算合約（僅顯示近期未到期合約）</option>
+                </select>
+            </div>
+
             <hr style="border: 0; border-top: 1px solid var(--panel-border); margin: 4px 0;">
 
             <div class="form-group">
@@ -1075,6 +1167,7 @@
         const btnCancel = document.getElementById('btn-cancel-modal');
         const btnSave = document.getElementById('btn-save-modal');
         const modeSelect = document.getElementById('mode-select');
+        const filterExpiredSelect = document.getElementById('filter-expired-select');
         const groupApiKey = document.getElementById('group-api-key');
         const groupSecretKey = document.getElementById('group-secret-key');
         const inputApiKey = document.getElementById('input-api-key');
@@ -1094,7 +1187,14 @@
         const btnModeStream = document.getElementById('btn-mode-stream');
         const btnModeSnapshot = document.getElementById('btn-mode-snapshot');
 
-        let isStreamMode = true; // true = 即時模式, false = 快照模式
+        let isStreamMode = true; 
+        let centerDisplayMode = 'strike'; // 'strike' 或 'ref'
+
+        document.getElementById('center-th-btn').addEventListener('click', () => {
+            centerDisplayMode = centerDisplayMode === 'strike' ? 'ref' : 'strike';
+            document.getElementById('center-header-text').innerText = centerDisplayMode === 'strike' ? '履約價' : '參考價';
+            renderStrikesTable();
+        });
 
         optionInfoCard.addEventListener('click', () => {
             if (optionMetricsGrid.style.display === 'none') {
@@ -1113,6 +1213,9 @@
             btnModeStream.classList.add('active');
             btnModeSnapshot.classList.remove('active');
             document.getElementById('ws-status-text').innerText = "連線狀態: 即時推送模式";
+            if (activeContractCode) {
+                loadStrikes(activeContractCode, currentHeaderLabel.innerText, null, currentAtmStrike);
+            }
         });
 
         btnModeSnapshot.addEventListener('click', (e) => {
@@ -1129,8 +1232,6 @@
 
         const contractDropdown = document.getElementById('contract-dropdown');
         const currentHeaderLabel = document.getElementById('current-header-label');
-        const strikeThBtn = document.getElementById('strike-th-btn');
-        const sortSymbol = document.getElementById('sort-symbol');
 
         let currentStrikesData = []; 
         let isAscending = false;    
@@ -1191,6 +1292,8 @@
         btnOpen.addEventListener('click', () => {
             const savedMode = localStorage.getItem('shioaji_mode') || 'default';
             modeSelect.value = savedMode;
+            const savedFilterExpired = localStorage.getItem('shioaji_filter_expired') || 'false';
+            filterExpiredSelect.value = savedFilterExpired;
             inputApiKey.value = localStorage.getItem('shioaji_api_key') || '';
             inputSecretKey.value = localStorage.getItem('shioaji_secret_key') || '';
             toggleCustomInputs();
@@ -1207,7 +1310,9 @@
 
         btnSave.addEventListener('click', () => {
             const mode = modeSelect.value;
+            const filterExpiredVal = filterExpiredSelect.value;
             localStorage.setItem('shioaji_mode', mode);
+            localStorage.setItem('shioaji_filter_expired', filterExpiredVal);
             if (mode === 'custom') {
                 localStorage.setItem('shioaji_api_key', inputApiKey.value.trim());
                 localStorage.setItem('shioaji_secret_key', inputSecretKey.value.trim());
@@ -1222,12 +1327,6 @@
         function updateTargetPrices(strike, callCode, putCode) {
             const callCodeEl = document.getElementById(`code-target-${callCode}`);
             const putCodeEl = document.getElementById(`code-target-${putCode}`);
-            const refColEl = document.getElementById(`ref-col-${strike}`);
-
-            if (refColEl) {
-                const refVal = strike - currentBasis;
-                refColEl.innerText = Math.round(refVal);
-            }
 
             if (callCode && callCodeEl) {
                 const cPriceEl = document.getElementById(`price-${callCode}`);
@@ -1350,36 +1449,80 @@
             const sorted = [...currentStrikesData].sort((a, b) => isAscending ? a.strike - b.strike : b.strike - a.strike);
 
             rows.forEach((tr, index) => {
-                const strikeCell = tr.querySelector('.strike-col');
-                const refCell = tr.querySelector('.ref-col');
+                const centerCell = tr.querySelector('.center-col');
                 if (sorted[index]) {
                     if (sorted[index].strike === atmStrike) {
-                        if (strikeCell) strikeCell.classList.add('atm-strike');
-                        if (refCell) refCell.classList.add('atm-ref');
+                        if (centerCell) centerCell.classList.add('atm-strike');
                     } else {
-                        if (strikeCell) strikeCell.classList.remove('atm-strike');
-                        if (refCell) refCell.classList.remove('atm-ref');
+                        if (centerCell) centerCell.classList.remove('atm-strike');
                     }
                 }
             });
         }
 
+        // 全域買賣權鏡射對稱同步滾動引擎
+        let isSyncing = false;
+        function bindGlobalSymmetricScroll() {
+            const callHeader = document.getElementById('call-header-scroll');
+            const putHeader = document.getElementById('put-header-scroll');
+            const tbody = document.getElementById('t-quote-tbody');
+            const callBoxes = tbody.querySelectorAll('.call-side-scroll');
+            const putBoxes = tbody.querySelectorAll('.put-side-scroll');
+
+            const allCallElements = [callHeader, ...callBoxes];
+            const allPutElements = [putHeader, ...putBoxes];
+
+            function applySync(e, isCallSource) {
+                if (isSyncing) return;
+                isSyncing = true;
+
+                const src = e.target;
+                const maxScrollSrc = src.scrollWidth - src.clientWidth;
+                const ratio = maxScrollSrc > 0 ? src.scrollLeft / maxScrollSrc : 0;
+
+                const sourceElements = isCallSource ? allCallElements : allPutElements;
+                const targetElements = isCallSource ? allPutElements : allCallElements;
+
+                sourceElements.forEach(el => {
+                    if (el !== src) {
+                        const maxS = el.scrollWidth - el.clientWidth;
+                        el.scrollLeft = ratio * maxS;
+                    }
+                });
+
+                targetElements.forEach(el => {
+                    const maxT = el.scrollWidth - el.clientWidth;
+                    el.scrollLeft = (1 - ratio) * maxT;
+                });
+
+                setTimeout(() => { isSyncing = false; }, 10);
+            }
+
+            allCallElements.forEach(el => {
+                el.onscroll = (e) => applySync(e, true);
+            });
+
+            allPutElements.forEach(el => {
+                el.onscroll = (e) => applySync(e, false);
+            });
+        }
+
+        // 點擊 ◂ ▸ 按鈕進行平滑鏡射滑動
+        function stepScroll(direction) {
+            const callHeader = document.getElementById('call-header-scroll');
+            if (!callHeader) return;
+            const scrollStep = 90;
+            callHeader.scrollLeft += direction * scrollStep;
+        }
+
         function renderStrikesTable() {
             const tbody = document.getElementById('t-quote-tbody');
             if (!currentStrikesData || currentStrikesData.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" style="color: var(--text-secondary); padding: 20px;">無履約價資料</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="3" style="color: var(--text-secondary); padding: 20px;">無履約價資料</td></tr>`;
                 return;
             }
 
             const sorted = [...currentStrikesData].sort((a, b) => isAscending ? a.strike - b.strike : b.strike - a.strike);
-
-            if (isAscending) {
-                sortSymbol.innerText = "▴";
-                strikeThBtn.title = "目前為升冪排序（由小到大），點擊切換為降冪";
-            } else {
-                sortSymbol.innerText = "▾";
-                strikeThBtn.title = "目前為降冪排序（由大到小），點擊切換為升冪";
-            }
 
             tbody.innerHTML = '';
             sorted.forEach(item => {
@@ -1392,38 +1535,45 @@
 
                 let initialCallTarget = callData.close > 0 ? Math.round((item.strike + callData.close) - currentBasis) : "--";
                 let initialPutTarget = putData.close > 0 ? Math.round((item.strike - putData.close) - currentBasis) : "--";
-                let initialRef = Math.round(item.strike - currentBasis);
+                
+                let displayVal = centerDisplayMode === 'strike' ? item.strike : Math.round(item.strike - currentBasis);
 
                 tr.innerHTML = `
                     <td class="side-col">
-                        <div class="side-inner">
-                            <span class="col-code" id="code-target-${callCode || 'none'}">${initialCallTarget}</span>
-                            <span class="col-vol" id="vol-${callCode || 'none'}">${callData.total_volume > 0 ? callData.total_volume.toLocaleString() : '--'}</span>
-                            <span class="col-strength" id="strength-${callCode || 'none'}" style="color: ${callData.strength > 0 ? 'var(--red-down)' : (callData.strength < 0 ? 'var(--green-up)' : 'var(--text-primary)')};">${callData.strength !== undefined ? callData.strength : '--'}</span>
-                            <span class="col-price" id="price-${callCode || 'none'}">${callData.close > 0 ? callData.close : '--'}</span>
+                        <div class="side-scroll-box call-side-scroll">
+                            <div class="side-inner">
+                                <span class="col-code" id="code-target-${callCode || 'none'}">${initialCallTarget}</span>
+                                <span class="col-vol" id="vol-${callCode || 'none'}">${callData.total_volume > 0 ? callData.total_volume.toLocaleString() : '--'}</span>
+                                <span class="col-strength" id="strength-${callCode || 'none'}" style="color: ${callData.strength > 0 ? 'var(--red-down)' : (callData.strength < 0 ? 'var(--green-up)' : 'var(--text-primary)')};">${callData.strength !== undefined ? callData.strength : '--'}</span>
+                                <span class="col-price" id="price-${callCode || 'none'}">${callData.close > 0 ? callData.close : '--'}</span>
+                            </div>
                         </div>
                     </td>
-                    <td class="ref-col" id="ref-col-${item.strike}">${initialRef}</td>
-                    <td class="strike-col">${item.strike}</td>
+                    <td class="center-col ${item.strike === currentAtmStrike ? 'atm-strike' : ''}" data-strike="${item.strike}" title="點擊切換 履約價 / 參考價">${displayVal}</td>
                     <td class="side-col">
-                        <div class="side-inner">
-                            <span class="col-price" id="price-${putCode || 'none'}">${putData.close > 0 ? putData.close : '--'}</span>
-                            <span class="col-strength" id="strength-${putCode || 'none'}" style="color: ${putData.strength > 0 ? 'var(--red-down)' : (putData.strength < 0 ? 'var(--green-up)' : 'var(--text-primary)')};">${putData.strength !== undefined ? putData.strength : '--'}</span>
-                            <span class="col-vol" id="vol-${putCode || 'none'}">${putData.total_volume > 0 ? putData.total_volume.toLocaleString() : '--'}</span>
-                            <span class="col-code" id="code-target-${putCode || 'none'}">${initialPutTarget}</span>
+                        <div class="side-scroll-box put-side-scroll">
+                            <div class="side-inner">
+                                <span class="col-price" id="price-${putCode || 'none'}">${putData.close > 0 ? putData.close : '--'}</span>
+                                <span class="col-strength" id="strength-${putCode || 'none'}" style="color: ${putData.strength > 0 ? 'var(--red-down)' : (putData.strength < 0 ? 'var(--green-up)' : 'var(--text-primary)')};">${putData.strength !== undefined ? putData.strength : '--'}</span>
+                                <span class="col-vol" id="vol-${putCode || 'none'}">${putData.total_volume > 0 ? putData.total_volume.toLocaleString() : '--'}</span>
+                                <span class="col-code" id="code-target-${putCode || 'none'}">${initialPutTarget}</span>
+                            </div>
                         </div>
                     </td>
                 `;
+
+                tr.querySelector('.center-col').addEventListener('click', () => {
+                    centerDisplayMode = centerDisplayMode === 'strike' ? 'ref' : 'strike';
+                    document.getElementById('center-header-text').innerText = centerDisplayMode === 'strike' ? '履約價' : '參考價';
+                    renderStrikesTable();
+                });
+
                 tbody.appendChild(tr);
             });
 
+            bindGlobalSymmetricScroll();
             calculateAtmAndRender();
         }
-
-        strikeThBtn.addEventListener('click', () => {
-            isAscending = !isAscending;
-            renderStrikesTable();
-        });
 
         contractDropdown.addEventListener('change', function() {
             const selectedOption = this.options[this.selectedIndex];
@@ -1460,8 +1610,8 @@
                 const expiry = new Date(expiryDate);
                 expiry.setHours(0, 0, 0, 0);
                 const diffDays = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
-                const dayText = diffDays >= 0 ? `${diffDays}天` : '已到期';
-                subtitleEl.innerText = `(剩 ${dayText})`;
+                const dayText = diffDays >= 0 ? `${diffDays}天` : '已結算';
+                subtitleEl.innerText = `(${dayText})`;
             }
 
             try {
@@ -1485,7 +1635,7 @@
                 const data = await response.json();
 
                 if (data.error || !data.strikes || data.strikes.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="4" style="color: var(--red-down); padding: 20px;">載入履約價失敗: ${data.error || '無資料'}</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="3" style="color: var(--red-down); padding: 20px;">載入履約價失敗: ${data.error || '無資料'}</td></tr>`;
                     currentStrikesData = [];
                     return;
                 }
@@ -1495,14 +1645,23 @@
                 renderStrikesTable();
             } catch (err) {
                 console.error("載入履約價失敗:", err);
-                tbody.innerHTML = `<tr><td colspan="4" style="color: var(--red-down); padding: 20px;">網路連線錯誤</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="3" style="color: var(--red-down); padding: 20px;">網路連線錯誤</td></tr>`;
                 currentStrikesData = [];
             }
         }
 
         async function loadContracts() {
             try {
-                const response = await fetch('/api/contracts');
+                const filterExpired = localStorage.getItem('shioaji_filter_expired') === 'true';
+                const mode = localStorage.getItem('shioaji_mode') || 'default';
+                let url = `/api/contracts?filter_expired=${filterExpired}`;
+                if (mode === 'custom') {
+                    const apiKey = localStorage.getItem('shioaji_api_key') || '';
+                    const secretKey = localStorage.getItem('shioaji_secret_key') || '';
+                    url += `&api_key=${encodeURIComponent(apiKey)}&secret_key=${encodeURIComponent(secretKey)}`;
+                }
+
+                const response = await fetch(url);
                 const contracts = await response.json();
                 
                 const tabsBar = document.getElementById('contract-tabs');
@@ -1524,7 +1683,7 @@
                     expiry.setHours(0, 0, 0, 0);
                     const diffTime = expiry - today;
                     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                    const dayText = diffDays >= 0 ? `${diffDays}天` : '已到期';
+                    const dayText = diffDays >= 0 ? `${diffDays}天` : '已結算';
                     
                     const btn = document.createElement('button');
                     btn.className = `contract-tab ${index === 0 ? 'active' : ''}`;
